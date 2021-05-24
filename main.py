@@ -1,10 +1,18 @@
-from dice import Dice 
+from dicegame import DiceGame
 from constants import Strategy
+from dice import Dice
 
-dice2 = Dice()
+strategy_ostekake = {
+    Strategy.START_BET: 0.000000006,
+    Strategy.ROLL_OVER: 89.90,
+    Strategy.INCREASE_ON_LOSS: 0.1137,
+    Strategy.SIMULATIONS: 1,
+    Strategy.MULTIPLIER: 9.8020
+}
 
-dice2.roll_dice()
+dice = Dice()
+game = DiceGame(strategy=strategy_ostekake, dice=dice, balance=0.0097)
 
-print(dice2.get_dice_value())
+game.run_simulation()
 
-print(Strategy.START_BET)
+print(game._bet)

@@ -24,11 +24,6 @@ class DiceGame():
         if self.highest_lose_streak < self.lose_streak:
             self.highest_lose_streak = self.lose_streak
 
-    def __reset_on_win(self, start_bet):
-        self._bet = start_bet
-        self.lose_streak = 0
-        self.accumulated_bet = 0
-
     def __update_lose_streak(self):
         self.lose_streak += 1
 
@@ -44,25 +39,45 @@ class DiceGame():
             
 
     def __update_stats(self, win):
-        start_bet = self._strategy[Strategy.START_BET]
-
         self.__update_highest_bet()            
 
         if win:
             self.__set_highest_lose_streak()
-            self.__reset_on_win(start_bet)
         else:
             self.__update_lose_streak()
 
 
+    def __reset_on_win(self, start_bet):
+        self._bet = start_bet
+        self.lose_streak = 0
+        self.accumulated_bet = 0
+
+    def __increase_bet_on_loss(self, increase_on_loss):
+        self._bet += self._bet*increase_on_loss
+
     def __upate(self):
+        #Stop execution, we lost it all!
+        if self._bet > self._balance:
+            return False
+
         value = self._dice.get_dice_value()
         win = True if value > self._strategy[Strategy.ROLL_OVER] else False
 
         self.__update_balance(win)
         self.__update_stats(win)
 
+        if win:
+            self.__reset_on_win(self._strategy[Strategy.START_BET])
+        else:
+            self.__increase_bet_on_loss(self._strategy[Strategy.INCREASE_ON_LOSS])
+
+
+        return True
+
     def run_simulation(self):        
         for i in range(self._strategy[Strategy.SIMULATIONS]):
             self._dice.roll_dice()
-            self.__upate()
+            success = self.__upate()
+
+            if not success:
+                break
