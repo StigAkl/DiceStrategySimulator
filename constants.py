@@ -1,4 +1,3 @@
-from enum import Enum
 
 class Strategy():
     START_BET = "startbet"
@@ -6,4 +5,5 @@ class Strategy():
     MULTIPLIER = "multiplier"
     SIMULATIONS = "num_simulations"
     INCREASE_ON_LOSS = "increaseonloss"
+    START_BALANCE = "startbalance"
     
