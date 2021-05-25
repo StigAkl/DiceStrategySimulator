@@ -68,7 +68,7 @@ class DiceGame():
         self.accumulated_bet = 0
 
     def __increase_bet_on_loss(self, increase_on_loss):
-        self._bet += self._bet*increase_on_loss
+        self._bet += round(self._bet*increase_on_loss,8)
 
     def execute(self):
         self._current_game += 1
@@ -78,8 +78,8 @@ class DiceGame():
             print("Balance too low")
             return False
 
+        self.accumulated_bet += round(self._bet,8)
         self.__update_highest_accumulated_bet()
-        self.accumulated_bet += self._bet
 
         self._dice.roll_dice()
         value = self._dice.get_dice_value()
