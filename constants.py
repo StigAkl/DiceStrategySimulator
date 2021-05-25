@@ -1,9 +1,12 @@
 
 class Strategy():
-    START_BET = "startbet"
-    ROLL_OVER = "rollover"
-    MULTIPLIER = "multiplier"
-    SIMULATIONS = "num_simulations"
-    INCREASE_ON_LOSS = "increaseonloss"
-    START_BALANCE = "startbalance"
+    START_BET = 1
+    ROLL_OVER = 2
+    MULTIPLIER = 3
+    SIMULATIONS = 4
+    INCREASE_ON_LOSS = 5
+    START_BALANCE = 6
+    RUN_UNTIL_PROFIT = 7
+    ADD_TO_BET_EVERY = 8
+    AMOUNT_ADD_TO_BET = 9
     
