@@ -57,6 +57,7 @@ class DiceGame():
 
     def __lose(self):
         self.lose_streak += 1
+        increase = round(self._bet*self._increase_on_loss, ndigits=8)
         self._bet += self._bet*self._increase_on_loss
         if self.lose_streak > self.highest_lose_streak: self.highest_lose_streak = self.lose_streak
 
@@ -79,7 +80,7 @@ class DiceGame():
             #Set advanced bet rules
             if self.set_bet_on_lose_streak > 0 and self.lose_streak == self.set_bet_on_lose_streak:
                 self._bet = self.amount_on_lose_streak
-            if not self.add_every_bet > 0 and self._current_game % self.add_every_bet == 0:
+            if self.add_every_bet > 0 and self._current_game % self.add_every_bet == 0:
                 self._bet += self.add_amount_every_bet
 
 

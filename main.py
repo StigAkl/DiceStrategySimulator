@@ -48,7 +48,7 @@ strategy_3 = {
     Strategy.START_BET: 0.00000005,
     Strategy.ROLL_OVER: 970,
     Strategy.INCREASE_ON_LOSS: 0.035,
-    Strategy.SIMULATIONS: 20000,
+    Strategy.SIMULATIONS: 200000,
     Strategy.MULTIPLIER: 97,
     Strategy.START_BALANCE: 0.00970,
     Strategy.ADD_EVERY_BET: 20,
