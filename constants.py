@@ -6,7 +6,12 @@ class Strategy():
     SIMULATIONS = 4
     INCREASE_ON_LOSS = 5
     START_BALANCE = 6
-    RUN_UNTIL_PROFIT = 7
-    ADD_TO_BET_EVERY = 8
-    AMOUNT_ADD_TO_BET = 9
+    IGNORE_OUT_OF_FUNDS = 7
+
+    #Set number of lose streaks before betting
+    ADD_TO_BET_ON_FIRST_LOSE_STREAK = 8
+    #Set amount to bet after number of lose streaks
+    AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK = 9
+
+    
     

@@ -2,16 +2,16 @@ from dicegame import DiceGame
 from constants import Strategy
 from dice import Dice
 from matplotlib import pyplot as plt
-import time
-import random
+
+btc_to_nok = 317604.05
 
 strategy_ostekake = {
-    Strategy.START_BET: 0.00000000,
+    Strategy.START_BET: 0.00000005,
     Strategy.ROLL_OVER: 899,
     Strategy.INCREASE_ON_LOSS: 0.1137,
-    Strategy.SIMULATIONS: 1000000,
+    Strategy.SIMULATIONS: 500000,
     Strategy.MULTIPLIER: 9.8020,
-    Strategy.START_BALANCE: 0.000614
+    Strategy.START_BALANCE: 0.0097
 }
 
 strategy_65 = {
@@ -30,16 +30,28 @@ strategy_33 = {
     Strategy.SIMULATIONS: 5000,
     Strategy.MULTIPLIER: 33.0,
     Strategy.START_BALANCE: 0.00970,
-    Strategy.ADD_TO_BET_EVERY: 20,
-    Strategy.AMOUNT_ADD_TO_BET: 0.00000100
+}
+
+strategy_45 = {
+    Strategy.START_BET: 0.0000000,
+    Strategy.ROLL_OVER: 550.0,
+    Strategy.INCREASE_ON_LOSS: 0.8335,
+    Strategy.SIMULATIONS: 20000,
+    Strategy.MULTIPLIER: 2.2,
+    Strategy.START_BALANCE: 0.00970,
+    Strategy.IGNORE_OUT_OF_FUNDS: False,
+    Strategy.ADD_TO_BET_ON_FIRST_LOSE_STREAK: 4,
+    Strategy.AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK: 0.00000010
 }
 
 dice = Dice(seed=None)
 
-game = DiceGame(strategy=strategy_ostekake, dice=dice)
+game = DiceGame(strategy=strategy_45, dice=dice)
+
 game.run_simulation()
-print("Highest acc bet: ", game.highest_accumulated_bet)
-print("Acc bet: ", game.accumulated_bet)
-print("Highest lose streak: ", game.highest_lose_streak)
-print("Balance: ", '{:.8f}'.format(game._balance))
-game.plot_result(game.profit_history, game.game_no_highest_loss_streak)
+
+print("Highest loss streak: ", game.highest_lose_streak)
+print("Balance: ", game._balance)
+print("Profit:", (game._balance - game._strategy[Strategy.START_BALANCE])*btc_to_nok)
+plt.plot(game.balance_history)
+plt.show()
