@@ -6,9 +6,7 @@ def print_format(btc):
     return '{:.8f}'.format(btc)
 
 class DiceGame():
-
     def __init__(self, strategy, dice):
-
         #Initialisation
         self._strategy = strategy
         self._dice = dice
@@ -78,7 +76,7 @@ class DiceGame():
             #Update game count
             self._current_game += 1
 
-            #Set exclusive bet rules
+            #Set advanced bet rules
             if self.set_bet_on_lose_streak > 0 and self.lose_streak == self.set_bet_on_lose_streak:
                 self._bet = self.amount_on_lose_streak
             if not self.add_every_bet > 0 and self._current_game % self.add_every_bet == 0:

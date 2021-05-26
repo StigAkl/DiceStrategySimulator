@@ -51,12 +51,13 @@ strategy_3 = {
     Strategy.SIMULATIONS: 20000,
     Strategy.MULTIPLIER: 97,
     Strategy.START_BALANCE: 0.00970,
-    Strategy.ADD_EVERY_BET: 20
+    Strategy.ADD_EVERY_BET: 20,
+    Strategy.ADD_AMOUNT_EVERY_BET: 0.00000005
 }
 
 dice = Dice(seed=None)
 
-game = DiceGame(strategy=strategy_45, dice=dice)
+game = DiceGame(strategy=strategy_3, dice=dice)
 
 game.run_simulation()
 
