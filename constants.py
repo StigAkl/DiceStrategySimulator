@@ -13,5 +13,9 @@ class Strategy():
     #Set amount to bet after number of lose streaks
     AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK = 9
 
+    #Add every bet
+    ADD_EVERY_BET = 10
+    ADD_AMOUNT_EVERY_BET = 11
+
     
     

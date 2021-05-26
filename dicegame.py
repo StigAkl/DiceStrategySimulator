@@ -20,8 +20,12 @@ class DiceGame():
         self._increase_on_loss = strategy[Strategy.INCREASE_ON_LOSS]
         self._start_bet = strategy[Strategy.START_BET]
         self._ignore_out_of_funds = False if not Strategy.IGNORE_OUT_OF_FUNDS in strategy else strategy[Strategy.IGNORE_OUT_OF_FUNDS]
-        self.set_bet_on_lose_streak = strategy[Strategy.ADD_TO_BET_ON_FIRST_LOSE_STREAK] if Strategy.ADD_TO_BET_ON_FIRST_LOSE_STREAK in strategy else -1
+        self.set_bet_on_lose_streak = strategy[Strategy.ADD_TO_BET_ON_FIRST_LOSE_STREAK] if Strategy.ADD_TO_BET_ON_FIRST_LOSE_STREAK in strategy else 0
         self.amount_on_lose_streak = strategy[Strategy.AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK] if Strategy.AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK in strategy else 0
+        
+        #Add every bet
+        self.add_every_bet = strategy[Strategy.ADD_EVERY_BET] if Strategy.ADD_EVERY_BET in strategy else 0
+        self.add_amount_every_bet = strategy[Strategy.ADD_AMOUNT_EVERY_BET] if Strategy.ADD_AMOUNT_EVERY_BET in strategy else 0
 
         #Statistics
         self.lose_streak = 0
@@ -39,7 +43,6 @@ class DiceGame():
     
     def execute(self):
         self._balance -= self._bet
-        self._current_game += 1
         self.accumulated_bet += self._bet
         value = self._dice.get_dice_value()
         
@@ -72,9 +75,14 @@ class DiceGame():
                 print("Number of rolls:", self._current_game)
                 break; 
 
+            #Update game count
+            self._current_game += 1
+
             #Set exclusive bet rules
-            if self.set_bet_on_lose_streak > -1 and self.lose_streak == self.set_bet_on_lose_streak:
+            if self.set_bet_on_lose_streak > 0 and self.lose_streak == self.set_bet_on_lose_streak:
                 self._bet = self.amount_on_lose_streak
+            if not self.add_every_bet > 0 and self._current_game % self.add_every_bet == 0:
+                self._bet += self.add_amount_every_bet
 
 
             #Roll dice

@@ -44,6 +44,16 @@ strategy_45 = {
     Strategy.AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK: 0.00000010
 }
 
+strategy_3 = {
+    Strategy.START_BET: 0.00000005,
+    Strategy.ROLL_OVER: 970,
+    Strategy.INCREASE_ON_LOSS: 0.035,
+    Strategy.SIMULATIONS: 20000,
+    Strategy.MULTIPLIER: 97,
+    Strategy.START_BALANCE: 0.00970,
+    Strategy.ADD_EVERY_BET: 20
+}
+
 dice = Dice(seed=None)
 
 game = DiceGame(strategy=strategy_45, dice=dice)
