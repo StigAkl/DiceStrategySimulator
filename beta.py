@@ -41,6 +41,19 @@ class DiceGame():
         self._bet_history = []
         self._accumulated_bet_history = []
 
+
+    def perform_action(self, action: Action):
+        actionType = action._type
+
+        if actionType == ACTION_TYPE.increaseByPercentage:
+            self._bet += round(self._bet*action._value, ndigits=8)
+
+        if actionType == ACTION_TYPE.resetBetAmount:
+            self._bet = round(self._start_bet, ndigits=8)
+
+        if actionType == ACTION_TYPE.setBetAmount:
+            self._bet = round(action._value, ndigits=8)
+
     def execute_lose_conditions(self):
         for i in range(0, len(self._conditions)):
             condition: Condition = self._conditions[i]
@@ -48,13 +61,15 @@ class DiceGame():
 
                 #Perform conditions on loss
                 if condition._conditionType == CONDITION_TYPE.every and self._losses % condition._value == 0:
-                    if condition._action._type == ACTION_TYPE.increaseByPercentage:
-                        self._bet += round(self._bet * condition._action._value, ndigits=8)
+                    self.perform_action(condition._action)
 
                 if condition._conditionType == CONDITION_TYPE.streakGreaterThan and self.lose_streak > condition._value:
-                    if condition._action._type == ACTION_TYPE.increaseByPercentage:
-                        self._bet += round(self._bet * condition._action._value, ndigits=8)
+                    self.perform_action(condition._action)
 
+                if condition._conditionType == CONDITION_TYPE.firstStreakOf and self.lose_streak == condition._value:
+                    self.perform_action(condition._action)
+                    
+                    
     def execute_win_conditions(self):
         for i in range(0, len(self._conditions)):
             condition = self._conditions[i]
@@ -76,7 +91,7 @@ class DiceGame():
             self.__lose()
 
     def __win(self):
-        self._balance += self._bet*self._multiplier
+        self._balance += round(self._bet*self._multiplier, ndigits=8)
         self.lose_streak = 0
         self.accumulated_bet = 0
         self.wins += 1
@@ -95,7 +110,7 @@ class DiceGame():
         # Game loop
         for i in range(self._strategy[Strategy.SIMULATIONS]):
             if self._bet > self._balance and not self._ignore_out_of_funds:
-                if self._balance > 0:
+                if self._balance > 0 and not self._ignore_out_of_funds:
                     self._bet = self._balance
                 else:
                     if not quiet:

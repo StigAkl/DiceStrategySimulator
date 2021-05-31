@@ -12,11 +12,11 @@ btc_to_nok = 317604.05
 trx_to_nok = 0.6
 
 strategy_45 = {
-    Strategy.START_BET: 0.5,
+    Strategy.START_BET: 0.05,
     Strategy.ROLL_OVER: 550.0,
-    Strategy.SIMULATIONS: 100,
+    Strategy.SIMULATIONS: 200000,
     Strategy.MULTIPLIER: 2.2,
-    Strategy.START_BALANCE: 1000,
+    Strategy.START_BALANCE: 4000,
     Strategy.IGNORE_OUT_OF_FUNDS: False,
     Strategy.CURRENCY: Currency.TRX,
     Strategy.CONDITIONS: [
@@ -35,10 +35,6 @@ def plot(data, label):
 def simulate(strategy):
     dice = Dice(seed=None)
     game = DiceGame(strategy=strategy, dice=dice)
-    x_axis = []
-
-    for i in range(0,5000):
-        x_axis.append(i)
         
     game.run_simulation()
 
