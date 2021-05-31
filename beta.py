@@ -1,11 +1,10 @@
+from Strategy.Action import Action
+from Strategy.Condition import Condition
+from Strategy.ConditionType import CONDITION_TYPE
+from Strategy.BetType import BET_TYPE
+from Strategy.ActionType import ACTION_TYPE
 from constants import Strategy
-import time
-from matplotlib import pyplot as plt
-
-
-def print_format(btc):
-    return '{:.8f}'.format(btc)
-
+import time 
 
 class DiceGame():
     def __init__(self, strategy, dice):
@@ -17,17 +16,10 @@ class DiceGame():
         self._simulations = strategy[Strategy.SIMULATIONS]
         self._roll_over = strategy[Strategy.ROLL_OVER]
         self._multiplier = strategy[Strategy.MULTIPLIER]
-        self._increase_on_loss = strategy[Strategy.INCREASE_ON_LOSS]
         self._start_bet = strategy[Strategy.START_BET]
         self._ignore_out_of_funds = False if not Strategy.IGNORE_OUT_OF_FUNDS in strategy else strategy[
             Strategy.IGNORE_OUT_OF_FUNDS]
-        self.set_bet_on_lose_streak = strategy[Strategy.ADD_TO_BET_ON_FIRST_LOSE_STREAK] if Strategy.ADD_TO_BET_ON_FIRST_LOSE_STREAK in strategy else 0
-        self.amount_on_lose_streak = strategy[Strategy.AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK] if Strategy.AMOUNT_TO_BET_ON_FIRST_LOSE_STREAK in strategy else 0
-        self._currency = strategy[Strategy.CURRENCY]
-
-        # Add every bet
-        self.add_every_bet = strategy[Strategy.ADD_EVERY_BET] if Strategy.ADD_EVERY_BET in strategy else 0
-        self.add_amount_every_bet = strategy[Strategy.ADD_AMOUNT_EVERY_BET] if Strategy.ADD_AMOUNT_EVERY_BET in strategy else 0
+        self._conditions = strategy[Strategy.CONDITIONS]
 
         # Statistics
         self.lose_streak = 0
@@ -38,6 +30,9 @@ class DiceGame():
         self.game_no_highest_loss_streak = 0
         self._last_payout = 0
         self._current_game = 0
+        self.wins = 0
+        self.win_streak = 0
+        self._losses = 0
         self._bust = False
 
         # For plotting
@@ -45,6 +40,30 @@ class DiceGame():
         self.profit_history = []
         self._bet_history = []
         self._accumulated_bet_history = []
+
+    def execute_lose_conditions(self):
+        for i in range(0, len(self._conditions)):
+            condition: Condition = self._conditions[i]
+            if condition._bet_type == BET_TYPE.LOSE:
+
+                #Perform conditions on loss
+                if condition._conditionType == CONDITION_TYPE.every and self._losses % condition._value == 0:
+                    if condition._action._type == ACTION_TYPE.increaseByPercentage:
+                        self._bet += round(self._bet * condition._action._value, ndigits=8)
+
+                if condition._conditionType == CONDITION_TYPE.streakGreaterThan and self.lose_streak > condition._value:
+                    if condition._action._type == ACTION_TYPE.increaseByPercentage:
+                        self._bet += round(self._bet * condition._action._value, ndigits=8)
+
+    def execute_win_conditions(self):
+        for i in range(0, len(self._conditions)):
+            condition = self._conditions[i]
+            if condition._bet_type == BET_TYPE.WIN:
+
+                #Perform conditions on win
+                if condition._conditionType == CONDITION_TYPE.every and self.wins % condition._value == 0:
+                    if condition._action._type == ACTION_TYPE.resetBetAmount:
+                        self._bet = self._start_bet
 
     def execute(self):
         self._balance -= self._bet
@@ -60,14 +79,19 @@ class DiceGame():
         self._balance += self._bet*self._multiplier
         self.lose_streak = 0
         self.accumulated_bet = 0
-        self._bet = self._start_bet
+        self.wins += 1
+        self.win_streak += 1
+        self.execute_win_conditions()
+        print("win")
 
     def __lose(self):
         self.lose_streak += 1
-        increase = round(self._bet*self._increase_on_loss, ndigits=8)
-        self._bet += increase
+        self.win_streak = 0
+        self._losses += 1
         if self.lose_streak > self.highest_lose_streak:
             self.highest_lose_streak = self.lose_streak
+        self.execute_lose_conditions()
+        print("loss")
 
     def run_simulation(self, quiet=False):
         # Game loop
@@ -87,12 +111,6 @@ class DiceGame():
             # Update game count
             self._current_game += 1
 
-            # Set advanced bet rules
-            if self.set_bet_on_lose_streak > 0 and self.lose_streak == self.set_bet_on_lose_streak:
-                self._bet = self.amount_on_lose_streak
-            if self.add_every_bet > 0 and self._current_game % self.add_every_bet == 0:
-                self._bet += self.add_amount_every_bet
-
             # Roll dice
             self._dice.roll_dice()
 
@@ -105,3 +123,5 @@ class DiceGame():
 
             # Execute main logic
             self.execute()
+            print(self._bet)
+            time.sleep(1)
