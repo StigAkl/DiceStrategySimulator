@@ -82,7 +82,6 @@ class DiceGame():
         self.wins += 1
         self.win_streak += 1
         self.execute_win_conditions()
-        print("win")
 
     def __lose(self):
         self.lose_streak += 1
@@ -91,7 +90,6 @@ class DiceGame():
         if self.lose_streak > self.highest_lose_streak:
             self.highest_lose_streak = self.lose_streak
         self.execute_lose_conditions()
-        print("loss")
 
     def run_simulation(self, quiet=False):
         # Game loop
@@ -123,5 +121,3 @@ class DiceGame():
 
             # Execute main logic
             self.execute()
-            print(self._bet)
-            time.sleep(1)
