@@ -43,6 +43,8 @@ class DiceGame():
         # For plotting
         self.balance_history = []
         self.profit_history = []
+        self._bet_history = []
+        self._accumulated_bet_history = []
 
     def execute(self):
         self._balance -= self._bet
@@ -68,20 +70,20 @@ class DiceGame():
             self.highest_lose_streak = self.lose_streak
 
     def run_simulation(self, quiet=False):
-        self.balance_history.append(self._balance)
-        self.profit_history.append(
-            self._balance - self._strategy[Strategy.START_BALANCE])
-
+        
         # Game loop
         for i in range(self._strategy[Strategy.SIMULATIONS]):
             if self._bet > self._balance and not self._ignore_out_of_funds:
-                if not quiet:
-                    print("Out of funds")
-                    print("Balance:", self._balance)
-                    print("Current bet:", self._bet)
-                    print("Number of rolls:", self._current_game)
-                self._bust = True
-                break
+                if self._balance > 0:
+                    self._bet = self._balance
+                else:
+                    if not quiet:
+                        print("Out of funds")
+                        print("Balance:", self._balance)
+                        print("Current bet:", self._bet)
+                        print("Number of rolls:", self._current_game)
+                    self._bust = True
+                    break
 
             # Update game count
             self._current_game += 1
@@ -95,9 +97,12 @@ class DiceGame():
             # Roll dice
             self._dice.roll_dice()
 
-            # Execute main logic
-            self.execute()
-
+            #Update plot data
+            self._bet_history.append(self._bet)
             self.balance_history.append(round(self._balance, 8))
             self.profit_history.append(
                 self._balance - self._strategy[Strategy.START_BALANCE])
+            self._accumulated_bet_history.append(self.accumulated_bet)
+
+            # Execute main logic
+            self.execute()
