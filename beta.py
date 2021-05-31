@@ -1,10 +1,9 @@
 from Strategy.Action import Action
-from Strategy.Condition import Condition
-from Strategy.ConditionType import CONDITION_TYPE
+from Strategy.BetCondition import BetCondition
+from Strategy.ConditionType import BET_CONDITION_TYPE
 from Strategy.BetType import BET_TYPE
 from Strategy.ActionType import ACTION_TYPE
 from constants import Strategy
-import time 
 
 class DiceGame():
     def __init__(self, strategy, dice):
@@ -56,36 +55,35 @@ class DiceGame():
 
     def execute_lose_conditions(self):
         for i in range(0, len(self._conditions)):
-            condition: Condition = self._conditions[i]
+            condition: BetCondition = self._conditions[i]
             if condition._bet_type == BET_TYPE.LOSE:
 
                 #Perform conditions on loss
-                if condition._conditionType == CONDITION_TYPE.every and self._losses % condition._value == 0:
+                if condition._conditionType == BET_CONDITION_TYPE.every and self._losses % condition._value == 0:
                     self.perform_action(condition._action)
 
-                if condition._conditionType == CONDITION_TYPE.streakGreaterThan and self.lose_streak > condition._value:
+                if condition._conditionType == BET_CONDITION_TYPE.streakGreaterThan and self.lose_streak > condition._value:
                     self.perform_action(condition._action)
 
-                if condition._conditionType == CONDITION_TYPE.firstStreakOf and self.lose_streak == condition._value:
+                if condition._conditionType == BET_CONDITION_TYPE.firstStreakOf and self.lose_streak == condition._value:
                     self.perform_action(condition._action)
-                    
+
                     
     def execute_win_conditions(self):
         for i in range(0, len(self._conditions)):
-            condition = self._conditions[i]
+            condition: BetCondition = self._conditions[i]
             if condition._bet_type == BET_TYPE.WIN:
 
                 #Perform conditions on win
-                if condition._conditionType == CONDITION_TYPE.every and self.wins % condition._value == 0:
-                    if condition._action._type == ACTION_TYPE.resetBetAmount:
-                        self._bet = self._start_bet
+                if condition._conditionType == BET_CONDITION_TYPE.every and self.wins % condition._value == 0:
+                    self.perform_action(condition._action)
 
     def execute(self):
         self._balance -= self._bet
         self.accumulated_bet += self._bet
         value = self._dice.get_dice_value()
 
-        if value > self._roll_over:
+        if value >= self._roll_over:
             self.__win()
         else:
             self.__lose()
@@ -106,20 +104,15 @@ class DiceGame():
             self.highest_lose_streak = self.lose_streak
         self.execute_lose_conditions()
 
-    def run_simulation(self, quiet=False):
-        # Game loop
-        for i in range(self._strategy[Strategy.SIMULATIONS]):
+    def perform_game_loop(self, quiet: bool):
             if self._bet > self._balance and not self._ignore_out_of_funds:
-                if self._balance > 0 and not self._ignore_out_of_funds:
-                    self._bet = self._balance
-                else:
-                    if not quiet:
-                        print("Out of funds")
-                        print("Balance:", self._balance)
-                        print("Current bet:", self._bet)
-                        print("Number of rolls:", self._current_game)
-                    self._bust = True
-                    break
+                if not quiet:
+                    print("Out of funds")
+                    print("Balance:", self._balance)
+                    print("Current bet:", self._bet)
+                    print("Number of rolls:", self._current_game)
+                self._bust = True
+                return False
 
             # Update game count
             self._current_game += 1
@@ -136,3 +129,17 @@ class DiceGame():
 
             # Execute main logic
             self.execute()
+            return True
+
+    def run_simulation(self, quiet=False):
+        if self._simulations > 0:
+            for i in range(self._strategy[Strategy.SIMULATIONS]):
+                run = self.perform_game_loop(quiet)
+                if not run:
+                    break
+        else:
+            while True:
+                run = self.perform_game_loop(quiet)
+                if not run:
+                    break
+

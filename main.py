@@ -1,8 +1,8 @@
 from Strategy.BetType import BET_TYPE
 from Strategy.Action import Action
 from Strategy.ActionType import ACTION_TYPE
-from Strategy.ConditionType import CONDITION_TYPE
-from Strategy.Condition import Condition
+from Strategy.ConditionType import BET_CONDITION_TYPE
+from Strategy.BetCondition import BetCondition
 from beta import DiceGame
 from constants import Currency, Strategy
 from dice import Dice
@@ -12,16 +12,17 @@ btc_to_nok = 317604.05
 trx_to_nok = 0.6
 
 strategy_45 = {
-    Strategy.START_BET: 0.05,
+    Strategy.START_BET: 0.00,
     Strategy.ROLL_OVER: 550.0,
-    Strategy.SIMULATIONS: 200000,
+    Strategy.SIMULATIONS: 3000000,
     Strategy.MULTIPLIER: 2.2,
-    Strategy.START_BALANCE: 4000,
+    Strategy.START_BALANCE: 1000,
     Strategy.IGNORE_OUT_OF_FUNDS: False,
     Strategy.CURRENCY: Currency.TRX,
     Strategy.CONDITIONS: [
-        Condition(CONDITION_TYPE.streakGreaterThan, 0, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.84)),
-        Condition(CONDITION_TYPE.every, 1, BET_TYPE.WIN, Action(ACTION_TYPE.resetBetAmount))
+        BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 0, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.84)),
+        BetCondition(BET_CONDITION_TYPE.every, 1, BET_TYPE.WIN, Action(ACTION_TYPE.resetBetAmount)), 
+        BetCondition(BET_CONDITION_TYPE.firstStreakOf, 2, BET_TYPE.LOSE, Action(ACTION_TYPE.setBetAmount, 0.00461))
     ]
 }
 

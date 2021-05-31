@@ -1,5 +1,5 @@
 from enum import Enum
-class CONDITION_TYPE(Enum):
+class BET_CONDITION_TYPE(Enum):
     streakGreaterThan = 0
     firstStreakOf = 1
     streakLowerThan = 2
