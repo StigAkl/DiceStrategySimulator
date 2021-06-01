@@ -68,6 +68,9 @@ class DiceGame():
                 if condition._conditionType == BET_CONDITION_TYPE.firstStreakOf and self.lose_streak == condition._value:
                     self.perform_action(condition._action)
 
+                if condition._conditionType == BET_CONDITION_TYPE.everyStreakOf and self.lose_streak > 0 and self.lose_streak % condition._value == 0:
+                    self.perform_action(condition._action, kake="resetting bet")
+
                     
     def execute_win_conditions(self):
         for i in range(0, len(self._conditions)):
