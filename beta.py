@@ -5,6 +5,7 @@ from Strategy.BetType import BET_TYPE
 from Strategy.ActionType import ACTION_TYPE
 from constants import Strategy
 
+
 class DiceGame():
     def __init__(self, strategy, dice):
         # Initialisation
@@ -40,7 +41,6 @@ class DiceGame():
         self._bet_history = []
         self._accumulated_bet_history = []
 
-
     def perform_action(self, action: Action):
         actionType = action._type
 
@@ -58,7 +58,7 @@ class DiceGame():
             condition: BetCondition = self._conditions[i]
             if condition._bet_type == BET_TYPE.LOSE:
 
-                #Perform conditions on loss
+                # Perform conditions on loss
                 if condition._conditionType == BET_CONDITION_TYPE.every and self._losses % condition._value == 0:
                     self.perform_action(condition._action)
 
@@ -69,16 +69,17 @@ class DiceGame():
                     self.perform_action(condition._action)
 
                 if condition._conditionType == BET_CONDITION_TYPE.everyStreakOf and self.lose_streak > 0 and self.lose_streak % condition._value == 0:
-                    self.perform_action(condition._action, kake="resetting bet")
+                    self.perform_action(condition._action)
 
-                    
     def execute_win_conditions(self):
         for i in range(0, len(self._conditions)):
             condition: BetCondition = self._conditions[i]
             if condition._bet_type == BET_TYPE.WIN:
 
-                #Perform conditions on win
+                # Perform conditions on win
                 if condition._conditionType == BET_CONDITION_TYPE.every and self.wins % condition._value == 0:
+                    self.perform_action(condition._action)
+                if condition._conditionType == BET_CONDITION_TYPE.streakGreaterThan and self.win_streak > condition._value:
                     self.perform_action(condition._action)
 
     def execute(self):
@@ -108,31 +109,32 @@ class DiceGame():
         self.execute_lose_conditions()
 
     def perform_game_loop(self, quiet: bool):
-            if self._bet > self._balance and not self._ignore_out_of_funds:
-                if not quiet:
-                    print("Out of funds")
-                    print("Balance:", self._balance)
-                    print("Current bet:", self._bet)
-                    print("Number of rolls:", self._current_game)
-                self._bust = True
-                return False
+        if self._balance >= 1500:
+            print("Reached profit goal in {} spins".format(self._current_game))
+            return False
+        if self._bet > self._balance and not self._ignore_out_of_funds:
+            if not quiet:
+                print("Out of funds")
+                print("Number of rolls:", self._current_game)
+            self._bust = True
+            return False
 
-            # Update game count
-            self._current_game += 1
+        # Update game count
+        self._current_game += 1
 
-            # Roll dice
-            self._dice.roll_dice()
+        # Roll dice
+        self._dice.roll_dice()
 
-            #Update plot data
-            self._bet_history.append(self._bet)
-            self.balance_history.append(round(self._balance, 8))
-            self.profit_history.append(
-                self._balance - self._strategy[Strategy.START_BALANCE])
-            self._accumulated_bet_history.append(self.accumulated_bet)
+        # Update plot data
+        self._bet_history.append(self._bet)
+        self.balance_history.append(round(self._balance, 8))
+        self.profit_history.append(
+            self._balance - self._strategy[Strategy.START_BALANCE])
+        self._accumulated_bet_history.append(self.accumulated_bet)
 
-            # Execute main logic
-            self.execute()
-            return True
+        # Execute main logic
+        self.execute()
+        return True
 
     def run_simulation(self, quiet=False):
         if self._simulations > 0:
@@ -145,4 +147,3 @@ class DiceGame():
                 run = self.perform_game_loop(quiet)
                 if not run:
                     break
-
