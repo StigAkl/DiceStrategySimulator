@@ -1,9 +1,11 @@
+from Strategy.ProfitCondition import ProfitCondition
 from Strategy.Action import Action
 from Strategy.BetCondition import BetCondition
-from Strategy.ConditionType import BET_CONDITION_TYPE
+from Strategy.ConditionType import BET_CONDITION_TYPE, PROFIT_CONDITION_TYPE
 from Strategy.BetType import BET_TYPE
 from Strategy.ActionType import ACTION_TYPE
 from constants import Strategy
+import time
 
 
 class DiceGame():
@@ -20,6 +22,8 @@ class DiceGame():
         self._ignore_out_of_funds = False if not Strategy.IGNORE_OUT_OF_FUNDS in strategy else strategy[
             Strategy.IGNORE_OUT_OF_FUNDS]
         self._conditions = strategy[Strategy.CONDITIONS]
+        self._profit_conditions = list(filter(lambda condition: type(
+            condition) == ProfitCondition, self._conditions))
 
         # Statistics
         self.lose_streak = 0
@@ -52,6 +56,9 @@ class DiceGame():
 
         if actionType == ACTION_TYPE.setBetAmount:
             self._bet = round(action._value, ndigits=8)
+
+        if actionType == ACTION_TYPE.addToBet:
+            self._bet += round(action._value, ndigits=8)
 
     def execute_lose_conditions(self):
         for i in range(0, len(self._conditions)):
@@ -87,7 +94,7 @@ class DiceGame():
         self.accumulated_bet += self._bet
         value = self._dice.get_dice_value()
 
-        if value >= self._roll_over:
+        if value > self._roll_over:
             self.__win()
         else:
             self.__lose()
@@ -109,9 +116,16 @@ class DiceGame():
         self.execute_lose_conditions()
 
     def perform_game_loop(self, quiet: bool):
-        if self._balance >= 1500:
-            print("Reached profit goal in {} spins".format(self._current_game))
-            return False
+
+        for i in range(0, len(self._profit_conditions)):
+            pcondition: ProfitCondition = self._profit_conditions[i]
+
+            if pcondition._conditionType == PROFIT_CONDITION_TYPE.greaterThanOrEqual and (self._balance - self._strategy[Strategy.START_BALANCE]) >= pcondition._value:
+                if pcondition._action._type == ACTION_TYPE.stopAutoBet:
+                    print("Reached profit of ", pcondition._value,
+                          " after ", self._current_game, " spins.")
+                    return False
+
         if self._bet > self._balance and not self._ignore_out_of_funds:
             if not quiet:
                 print("Out of funds")
@@ -134,6 +148,7 @@ class DiceGame():
 
         # Execute main logic
         self.execute()
+
         return True
 
     def run_simulation(self, quiet=False):
