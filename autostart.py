@@ -10,12 +10,14 @@ def start_auto_bet():
     mouse.position = button_pos
     time.sleep(1)
     mouse.press(Button.left)
+    time.sleep(0.2)
     mouse.release(Button.left)
 
 def has_autobet_stopped():
     time.sleep(2)
     # area of screen
     im=ImageGrab.grab(bbox=(450,1450,850,1530))
+    #im.show()
     custom_config = r'--oem 3 --psm 6'
     return "Start" in pytesseract.image_to_string(im, config=custom_config)
 
@@ -26,4 +28,4 @@ while True:
         print("Bet stopped, starting..")
         num_stopped += 1
         print("Stopped {} times".format(num_stopped))
-    time.sleep(2)
+    time.sleep(1)

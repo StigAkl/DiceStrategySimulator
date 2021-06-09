@@ -70,7 +70,6 @@ class DiceGame():
             self.highest_lose_streak = self.lose_streak
 
     def run_simulation(self, quiet=False):
-        
         # Game loop
         for i in range(self._strategy[Strategy.SIMULATIONS]):
             if self._bet > self._balance and not self._ignore_out_of_funds:
