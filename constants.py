@@ -12,3 +12,4 @@ class Strategy():
 class Currency():
     BTC = 317604.05
     TRX = 0.6
+    NOK = 1

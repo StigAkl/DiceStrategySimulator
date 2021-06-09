@@ -3,8 +3,8 @@ import random
 
 simulations = 50
 total_rounds = 0
-limit = 21
-roll_over = 550
+limit = 6
+roll_over = 100
 least_rounds = 9999999
 max_rounds = 0
 for i in range(simulations):

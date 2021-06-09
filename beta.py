@@ -53,6 +53,14 @@ class DiceGame():
         if actionType == ACTION_TYPE.setBetAmount:
             self._bet = round(action._value, ndigits=8)
 
+        if actionType == ACTION_TYPE.resetWinChance:
+            self._roll_over = self._strategy[Strategy.ROLL_OVER]
+            self._multiplier = self._strategy[Strategy.MULTIPLIER]
+
+        if actionType == ACTION_TYPE.setRollOver:
+            self._roll_over = action._value[0]
+            self._multiplier = action._value[1]
+
     def execute_lose_conditions(self):
         for i in range(0, len(self._conditions)):
             condition: BetCondition = self._conditions[i]
@@ -71,6 +79,7 @@ class DiceGame():
                 if condition._conditionType == BET_CONDITION_TYPE.everyStreakOf and self.lose_streak > 0 and self.lose_streak % condition._value == 0:
                     self.perform_action(condition._action, kake="resetting bet")
 
+                
                     
     def execute_win_conditions(self):
         for i in range(0, len(self._conditions)):
@@ -86,7 +95,7 @@ class DiceGame():
         self.accumulated_bet += self._bet
         value = self._dice.get_dice_value()
 
-        if value >= self._roll_over:
+        if value > self._roll_over:
             self.__win()
         else:
             self.__lose()
