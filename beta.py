@@ -1,9 +1,12 @@
+from Strategy.ProfitCondition import ProfitCondition
 from Strategy.Action import Action
 from Strategy.BetCondition import BetCondition
-from Strategy.ConditionType import BET_CONDITION_TYPE
+from Strategy.ConditionType import BET_CONDITION_TYPE, PROFIT_CONDITION_TYPE
 from Strategy.BetType import BET_TYPE
 from Strategy.ActionType import ACTION_TYPE
 from constants import Strategy
+import time
+
 
 class DiceGame():
     def __init__(self, strategy, dice):
@@ -19,6 +22,8 @@ class DiceGame():
         self._ignore_out_of_funds = False if not Strategy.IGNORE_OUT_OF_FUNDS in strategy else strategy[
             Strategy.IGNORE_OUT_OF_FUNDS]
         self._conditions = strategy[Strategy.CONDITIONS]
+        self._profit_conditions = list(filter(lambda condition: type(
+            condition) == ProfitCondition, self._conditions))
 
         # Statistics
         self.lose_streak = 0
@@ -39,7 +44,6 @@ class DiceGame():
         self.profit_history = []
         self._bet_history = []
         self._accumulated_bet_history = []
-
 
     def perform_action(self, action: Action):
         actionType = action._type
@@ -66,7 +70,7 @@ class DiceGame():
             condition: BetCondition = self._conditions[i]
             if condition._bet_type == BET_TYPE.LOSE:
 
-                #Perform conditions on loss
+                # Perform conditions on loss
                 if condition._conditionType == BET_CONDITION_TYPE.every and self._losses % condition._value == 0:
                     self.perform_action(condition._action)
 
@@ -77,7 +81,7 @@ class DiceGame():
                     self.perform_action(condition._action)
 
                 if condition._conditionType == BET_CONDITION_TYPE.everyStreakOf and self.lose_streak > 0 and self.lose_streak % condition._value == 0:
-                    self.perform_action(condition._action, kake="resetting bet")
+                    self.perform_action(condition._action)
 
                 
                     
@@ -86,8 +90,10 @@ class DiceGame():
             condition: BetCondition = self._conditions[i]
             if condition._bet_type == BET_TYPE.WIN:
 
-                #Perform conditions on win
+                # Perform conditions on win
                 if condition._conditionType == BET_CONDITION_TYPE.every and self.wins % condition._value == 0:
+                    self.perform_action(condition._action)
+                if condition._conditionType == BET_CONDITION_TYPE.streakGreaterThan and self.win_streak > condition._value:
                     self.perform_action(condition._action)
 
     def execute(self):
@@ -117,31 +123,40 @@ class DiceGame():
         self.execute_lose_conditions()
 
     def perform_game_loop(self, quiet: bool):
-            if self._bet > self._balance and not self._ignore_out_of_funds:
-                if not quiet:
-                    print("Out of funds")
-                    print("Balance:", self._balance)
-                    print("Current bet:", self._bet)
-                    print("Number of rolls:", self._current_game)
-                self._bust = True
-                return False
 
-            # Update game count
-            self._current_game += 1
+        for i in range(0, len(self._profit_conditions)):
+            pcondition: ProfitCondition = self._profit_conditions[i]
 
-            # Roll dice
-            self._dice.roll_dice()
+            if pcondition._conditionType == PROFIT_CONDITION_TYPE.greaterThanOrEqual and (self._balance - self._strategy[Strategy.START_BALANCE]) >= pcondition._value:
+                if pcondition._action._type == ACTION_TYPE.stopAutoBet:
+                    print("Reached profit of ", pcondition._value,
+                          " after ", self._current_game, " spins.")
+                    return False
 
-            #Update plot data
-            self._bet_history.append(self._bet)
-            self.balance_history.append(round(self._balance, 8))
-            self.profit_history.append(
-                self._balance - self._strategy[Strategy.START_BALANCE])
-            self._accumulated_bet_history.append(self.accumulated_bet)
+        if self._bet > self._balance and not self._ignore_out_of_funds:
+            if not quiet:
+                print("Out of funds")
+                print("Number of rolls:", self._current_game)
+            self._bust = True
+            return False
 
-            # Execute main logic
-            self.execute()
-            return True
+        # Update game count
+        self._current_game += 1
+
+        # Roll dice
+        self._dice.roll_dice()
+
+        # Update plot data
+        self._bet_history.append(self._bet)
+        self.balance_history.append(round(self._balance, 8))
+        self.profit_history.append(
+            self._balance - self._strategy[Strategy.START_BALANCE])
+        self._accumulated_bet_history.append(self.accumulated_bet)
+
+        # Execute main logic
+        self.execute()
+
+        return True
 
     def run_simulation(self, quiet=False):
         if self._simulations > 0:
@@ -154,4 +169,3 @@ class DiceGame():
                 run = self.perform_game_loop(quiet)
                 if not run:
                     break
-
