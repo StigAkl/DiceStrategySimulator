@@ -29,3 +29,9 @@ while True:
         num_stopped += 1
         print("Stopped {} times".format(num_stopped))
     time.sleep(1)
+    button_pos = (338, 736)
+    mouse.position = button_pos
+    time.sleep(2)
+    pos2 = (400,400)
+    mouse.position = pos2
+    time.sleep(1)

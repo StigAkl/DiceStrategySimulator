@@ -30,22 +30,6 @@ strategy_3 = {
     ]
 }
 
-strategy_45 = {
-    Strategy.START_BET: 0.000,
-    Strategy.ROLL_OVER: 550,
-    Strategy.SIMULATIONS: 1000000,
-    Strategy.MULTIPLIER: 2.2,
-    Strategy.START_BALANCE: 100000,
-    Strategy.IGNORE_OUT_OF_FUNDS: False,
-    Strategy.CURRENCY: Currency.NOK,
-    Strategy.CONDITIONS: [
-        BetCondition(BET_CONDITION_TYPE.every, 1, BET_TYPE.WIN, Action(ACTION_TYPE.resetBetAmount)), 
-        BetCondition(BET_CONDITION_TYPE.firstStreakOf, 2, BET_TYPE.LOSE, Action(ACTION_TYPE.setBetAmount, 0.078)),
-        BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 2, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.84)),
-        ProfitCondition(PROFIT_CONDITION_TYPE.greaterThan, 200, PROFIT_TYPE.PROFIT, Action(ACTION_TYPE.stopAutoBet))
-    ]
-}
-
 strategy_50_90 = {
     Strategy.START_BET: 0.0003,
     Strategy.ROLL_OVER: 505,
@@ -61,6 +45,21 @@ strategy_50_90 = {
         BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 0, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 13))
     ]
 }
+
+strategy_45 = {
+    Strategy.START_BET: 0.01,
+    Strategy.ROLL_OVER: 550,
+    Strategy.SIMULATIONS: 20000,
+    Strategy.MULTIPLIER: 2.2,
+    Strategy.START_BALANCE: 6700,
+    Strategy.IGNORE_OUT_OF_FUNDS: False,
+    Strategy.CURRENCY: Currency.NOK,
+    Strategy.CONDITIONS: [
+        BetCondition(BET_CONDITION_TYPE.every, 1, BET_TYPE.WIN, Action(ACTION_TYPE.resetBetAmount)), 
+        BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 0, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.88))
+    ]
+}
+
 def plot(data, label):
     plt.plot(data, color='k', linestyle='solid', label=label)
     plt.xlabel('Rounds')
@@ -105,5 +104,5 @@ def probability_of_bust(strategy, runs=300):
     print("Average profit per run: {}".format(totalProfit/(runs-busts)))
 
 
-simulate(strategy_45)
-# probability_of_bust(strategy_45)
+#simulate(strategy_45)
+probability_of_bust(strategy_45)
