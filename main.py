@@ -31,11 +31,11 @@ strategy_3 = {
 }
 
 strategy_50_90 = {
-    Strategy.START_BET: 0.0003,
+    Strategy.START_BET: 0.0,
     Strategy.ROLL_OVER: 505,
     Strategy.SIMULATIONS: 5000,
     Strategy.MULTIPLIER: 2.0,
-    Strategy.START_BALANCE: 24,
+    Strategy.START_BALANCE: 16000,
     Strategy.IGNORE_OUT_OF_FUNDS: False,
     Strategy.CURRENCY: Currency.NOK,
     Strategy.CONDITIONS: [
@@ -47,7 +47,7 @@ strategy_50_90 = {
 }
 
 strategy_45 = {
-    Strategy.START_BET: 0.01,
+    Strategy.START_BET: 0.0,
     Strategy.ROLL_OVER: 550,
     Strategy.SIMULATIONS: 20000,
     Strategy.MULTIPLIER: 2.2,
@@ -56,7 +56,8 @@ strategy_45 = {
     Strategy.CURRENCY: Currency.NOK,
     Strategy.CONDITIONS: [
         BetCondition(BET_CONDITION_TYPE.every, 1, BET_TYPE.WIN, Action(ACTION_TYPE.resetBetAmount)), 
-        BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 0, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.88))
+        BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 1, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.87)),
+        BetCondition(BET_CONDITION_TYPE.firstStreakOf, 1, BET_TYPE.LOSE, Action(ACTION_TYPE.setBetAmount, 0.05)), 
     ]
 }
 
