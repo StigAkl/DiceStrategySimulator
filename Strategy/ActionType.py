@@ -7,3 +7,5 @@ class ACTION_TYPE(Enum):
     resetBetAmount = 2
     resetWinChance = 3
     setRollOver = 4
+    stopAutoBet = 5
+    addToBet = 6

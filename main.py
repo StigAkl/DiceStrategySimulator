@@ -41,7 +41,8 @@ strategy_45 = {
     Strategy.CONDITIONS: [
         BetCondition(BET_CONDITION_TYPE.every, 1, BET_TYPE.WIN, Action(ACTION_TYPE.resetBetAmount)), 
         BetCondition(BET_CONDITION_TYPE.firstStreakOf, 2, BET_TYPE.LOSE, Action(ACTION_TYPE.setBetAmount, 0.078)),
-        BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 2, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.84))
+        BetCondition(BET_CONDITION_TYPE.streakGreaterThan, 2, BET_TYPE.LOSE, Action(ACTION_TYPE.increaseByPercentage, 0.84)),
+        ProfitCondition(PROFIT_CONDITION_TYPE.greaterThan, 200, PROFIT_TYPE.PROFIT, Action(ACTION_TYPE.stopAutoBet))
     ]
 }
 
