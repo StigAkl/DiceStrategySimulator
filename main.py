@@ -49,9 +49,9 @@ strategy_50_90 = {
 strategy_45 = {
     Strategy.START_BET: 0.0,
     Strategy.ROLL_OVER: 550,
-    Strategy.SIMULATIONS: 20000,
+    Strategy.SIMULATIONS: 200000,
     Strategy.MULTIPLIER: 2.2,
-    Strategy.START_BALANCE: 6700,
+    Strategy.START_BALANCE: 400000,
     Strategy.IGNORE_OUT_OF_FUNDS: False,
     Strategy.CURRENCY: Currency.NOK,
     Strategy.CONDITIONS: [
@@ -105,5 +105,5 @@ def probability_of_bust(strategy, runs=300):
     print("Average profit per run: {}".format(totalProfit/(runs-busts)))
 
 
-#simulate(strategy_45)
-probability_of_bust(strategy_45)
+simulate(strategy_45)
+#probability_of_bust(strategy_45)
